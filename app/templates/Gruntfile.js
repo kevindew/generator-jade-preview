@@ -27,10 +27,6 @@ module.exports = function (grunt) {
 
     // Watches files for changes and runs tasks based on the changed files
     watch: {
-      bower: {
-        files: ['bower.json'],
-        tasks: ['wiredep']
-      },
       jade: {
         files: ['<%= config.app %>/**/*.jade'],
         tasks: ['jade']
@@ -38,14 +34,14 @@ module.exports = function (grunt) {
       coffee: {
         files: ['<%%= config.app %>/scripts/**/*.{coffee,litcoffee,coffee.md}'],
         tasks: ['coffee:dist']
-      },<% } else { %>
+      },<% } %>
       js: {
         files: ['<%%= config.app %>/scripts/**/*.js'],
         tasks: ['jshint'],
         options: {
           livereload: true
         }
-      <% } %>
+      },
       gruntfile: {
         files: ['Gruntfile.js']
       },
@@ -128,6 +124,24 @@ module.exports = function (grunt) {
       server: '.tmp'
     },
 
+    jade: {
+      dist: {
+        options: {
+          pretty: true
+        },
+        files: [{
+          expand: true,
+          cwd: '<%= config.app %>',
+          dest: '.tmp',
+          src: [
+            '**/*.jade',
+            '!**/_*.jade'
+          ],
+          ext: '.html'
+        }]
+      }
+    },
+
     // Make sure code styles are up to par and there are no obvious mistakes
     jshint: {
       options: {
@@ -158,9 +172,9 @@ module.exports = function (grunt) {
     sass: {
       options: {<% if (libsass) { %>
         sourceMap: true,
-        includePaths: ['<%%= config.app %>/bower_components']
+        includePaths: ['bower_components']
         <% } else { %>
-        loadPath: '<%%= config.app %>/bower_components'
+        loadPath: 'bower_components'
       <% } %>},
       dist: {
         files: [{
@@ -180,7 +194,7 @@ module.exports = function (grunt) {
           ext: '.css'
         }]
       }
-    },<% } %>
+    },
 
     // Add vendor prefixed styles
     autoprefixer: {
@@ -191,21 +205,14 @@ module.exports = function (grunt) {
         files: [{
           expand: true,
           cwd: '.tmp/styles/',
-          src: '{,*/}*.css',
+          src: '**/*.css',
+          dest: '.tmp/styles/'
+        }, {
+          expand: true,
+          cwd: '<%%= config.app %>/styles/',
+          src: '**/*.css',
           dest: '.tmp/styles/'
         }]
-      }
-    },
-
-    // Automatically inject Bower components into the HTML file
-    wiredep: {
-      app: {
-        ignorePath: /^<%= config.app %>\/|\.\.\//,
-        src: ['.tmp/index.html']
-      },
-      sass: {
-        src: ['<%%= config.app %>/styles/{,*/}*.{scss,sass}'],
-        ignorePath: /(\.\.\/){1,2}bower_components\//
       }
     },
 
@@ -230,7 +237,7 @@ module.exports = function (grunt) {
       options: {
         dest: '<%%= config.dist %>'
       },
-      html: '.tmp/index.html'
+      html: '<%%= config.dist %>/index.html'
     },
 
     // Performs rewrites based on rev and the useminPrepare configuration
@@ -253,7 +260,7 @@ module.exports = function (grunt) {
           expand: true,
           cwd: '<%%= config.app %>/images',
           src: '**/*.{gif,jpeg,jpg,png}',
-          dest: '<%%= config.dist %>/images'
+          dest: '.tmp/images'
         }]
       }
     },
@@ -264,7 +271,7 @@ module.exports = function (grunt) {
           expand: true,
           cwd: '<%%= config.app %>/images',
           src: '**/*.svg',
-          dest: '<%%= config.dist %>/images'
+          dest: '.tmp/images'
         }]
       }
     },
@@ -328,18 +335,78 @@ module.exports = function (grunt) {
           src: [
             '*.{ico,png,txt}',
             'images/**/*.webp',
-            '**/*.html',
-            'styles/fonts/{,*/}*.*'
+            'styles/fonts/**/*.{eot,woff,woff2,svg,ttf}'
           ]
+        }, {
+          expand: true,
+          dot: true,
+          cwd: '.tmp',
+          dest: '<%%= config.dist %>',
+          src: 'images/**/*.{gif,jpeg,jpg,png,.svg}',
+        }, {
+          expand: true,
+          dot: true,
+          cwd: '.',
+          dest: '<%%= config.dist %>',
+          src: 'bower_components/**/*.{eot,woff,woff2,svg,ttf}',
         }]
+      },
+      distHtml: {
+        files: [{
+          expand: true,
+          dot: true,
+          cwd: '.tmp',
+          dest: '<%%= config.dist %>',
+          src: '**/*.html'
+        }, {
+          expand: true,
+          dot: true,
+          cwd: '<%%= config.app %>',
+          dest: '<%%= config.dist %>',
+          src: '**/*.html'
+        }]
+      },
+      preview: {
+        files: [{
+          expand: true,
+          dot: true,
+          cwd: '<%%= config.app %>',
+          dest: '<%%= config.preview %>',
+          src: [
+            '*.{ico,png,txt}',
+            'images/**/*.webp',
+            '**/*.html',
+            'styles/fonts/**/*.{eot,woff,woff2,svg,ttf}',
+            'scripts/**/*.js'
+          ]
+        }, {
+          expand: true,
+          dot: true,
+          cwd: '.tmp',
+          dest: '<%%= config.preview %>',
+          src: [
+            'images/**/*.{gif,jpeg,jpg,png,.svg}',
+            '**/*.html',
+            'styles/**/*.css',
+            'scripts/**/*.js'
+          ]
+        }, {
+          expand: true,
+          dot: true,
+          cwd: '.',
+          dest: '<%%= config.preview %>',
+          src: 'bower_components/**/*',
+        }]
+      },
       styles: {
         expand: true,
         dot: true,
         cwd: '<%%= config.app %>/styles',
         dest: '.tmp/styles/',
-        src: '{,*/}*.css'
+        src: '**/*.css'
       }
     },
+
 
     // Generates a custom Modernizr build that includes only the tests you
     // reference in your app
@@ -365,6 +432,13 @@ module.exports = function (grunt) {
         'sass:server',
         'copy:styles'
       ],
+      preview: [<% if (coffee) { %>
+        'coffee',<% } %>
+        'sass',
+        'copy:styles',
+        'imagemin',
+        'svgmin'
+      ],
       dist: [<% if (coffee) { %>
         'coffee',<% } %>
         'sass',
@@ -381,15 +455,15 @@ module.exports = function (grunt) {
       grunt.config.set('connect.options.hostname', '0.0.0.0');
     }
     if (target === 'preview') {
-      return grunt.task.run(['build', 'connect:dist:keepalive']);
+      return grunt.task.run(['build:preview', 'connect:preview:keepalive']);
     }
     if (target === 'dist') {
-      return grunt.task.run(['build', 'connect:dist:keepalive']);
+      return grunt.task.run(['build:dist', 'connect:dist:keepalive']);
     }
 
     grunt.task.run([
       'clean:server',
-      'wiredep',
+      'jade',
       'concurrent:server',
       'autoprefixer',
       'connect:livereload',
@@ -397,25 +471,39 @@ module.exports = function (grunt) {
     ]);
   });
 
-  grunt.registerTask('build', [
-    'clean:dist',
-    'wiredep',
-    'useminPrepare',
-    'concurrent:dist',
-    'autoprefixer',
-    'concat',
-    'cssmin',
-    'uglify',
-    'copy:dist',
-    'modernizr',
-    'rev',
-    'usemin',
-    'htmlmin'
-  ]);
+  grunt.registerTask('build', function(target) {
+
+    if (target === 'preview') {
+      return grunt.task.run([
+        'clean:preview',
+        'jade',
+        'concurrent:preview',
+        'autoprefixer',
+        'copy:preview'
+      ]);
+    }
+
+    grunt.task.run([
+      'clean:dist',
+      'jade',
+      'copy:distHtml',
+      'useminPrepare',
+      'concurrent:dist',
+      'autoprefixer',
+      'concat',
+      'cssmin',
+      'uglify',
+      'copy:dist',
+      'modernizr',
+      'rev',
+      'usemin',
+      'htmlmin'
+    ]);
+  });
 
   grunt.registerTask('default', [
     'newer:jshint',
-    'test',
-    'build'
+    'build:preview',
+    'build:dist'
   ]);
 };

@@ -1,0 +1,26 @@
+doctype
+html.no-js
+  block vars
+  head
+    meta(charset='utf-8')
+    meta(http-equiv='X-UA-Compatible', content='IE=edge')
+    title= ( pageTitle ? pageTitle + ' | ' : '' ) + '<%= projectName %>'
+    meta(name='description', content='')
+    // build:css({.,app,.tmp}) /styles/main.css
+    link(rel='stylesheet', href='/styles/main.css')
+    // endbuild
+    // build:js({.,app,.tmp}) /scripts/header.js
+    script(src='/bower_components/modernizr/modernizr.js')
+    // endbuild
+  body
+    header
+      h1 <%= projectName %>
+
+    main
+      block content
+
+    // build:js({.,app,.tmp}) /scripts/footer.js
+    script(src='/bower_components/jquery/dist/jquery.js')
+    script(src='/bower_components/masonry/dist/masonry.pkgd.js')
+    script(src='/scripts/main.js')
+    // endbuild

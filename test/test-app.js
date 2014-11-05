@@ -24,20 +24,22 @@ describe('jade-preview:app', function () {
       .withGenerators([[helpers.createDummyGenerator(), 'mocha:app']]);
   });
 
+  var expected = [
+    'bower.json',
+    'package.json',
+    '.bowerrc',
+    '.editorconfig',
+    '.gitattributes',
+    '.gitignore',
+    'Gruntfile.js',
+    '.jshintrc',
+    'README.md',
+    's3.json'
+  ];
+
   it('creates files', function (done) {
     runGen.withOptions(options).on('end', function () {
-      assert.file([
-        'bower.json',
-        'package.json',
-        '.bowerrc',
-        '.editorconfig',
-        '.gitattributes',
-        '.gitignore',
-        'Gruntfile.js',
-        '.jshintrc',
-        'README.md',
-        's3.json'
-      ]);
+      assert.file(expected);
 
       done();
     });
@@ -45,9 +47,8 @@ describe('jade-preview:app', function () {
 
 
   it('creates expected CoffeeScript files', function (done) {
-    runGen.withOptions(
-      _.extend(options, {coffee: true})
-    ).on('end', function () {
+    runGen.withOptions(options).withPrompt({ coffee: true })
+    .on('end', function () {
 
       assert.file([].concat(
         expected,
@@ -70,8 +71,6 @@ describe('jade-preview:app', function () {
 
       assert.fileContent([
         ['Gruntfile.js', /sass/],
-        ['app/index.html', /Sass/],
-        ['.gitignore', /\.sass-cache/],
         ['package.json', /grunt-contrib-sass/]
       ]);
 

@@ -56,10 +56,9 @@ describe('jade-preview:app', function () {
       ));
       assert.noFile('app/scripts/main.js');
 
-      assert.fileContent([].concat(
-        expectedContent,
-        [['Gruntfile.js', /coffee/]]
-      ));
+      assert.fileContent([
+        ['Gruntfile.js', /coffee/]
+      ]);
 
       done();
     });

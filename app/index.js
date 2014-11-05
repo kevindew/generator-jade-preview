@@ -12,10 +12,11 @@ var JadePreviewGenerator = yeoman.generators.Base.extend({
   prompting: function () {
     var done = this.async();
 
-    // Have Yeoman greet the user.
-    this.log(yosay(
-      'Welcome to the Jade Preview Generator!'
-    ));
+    if (!this.options['skip-welcome-message']) {
+      this.log(yosay(
+        'Welcome to the Jade Preview Generator!'
+      ));
+    }
 
     var prompts = [{
       type: 'value',
@@ -75,7 +76,12 @@ var JadePreviewGenerator = yeoman.generators.Base.extend({
   },
 
   end: function () {
-    this.installDependencies();
+    if (!this.options['skip-install']) {
+      this.installDependencies({
+        skipMessage: this.options['skip-install-message'],
+        skipInstall: this.options['skip-install']
+      });
+    }
   }
 });
 

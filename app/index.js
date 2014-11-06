@@ -33,12 +33,24 @@ var JadePreviewGenerator = yeoman.generators.Base.extend({
       name: 'coffee',
       message: 'Are you the sort of hipster that likes a bit of coffee script?',
       default: false
+    }, {
+      type: 'confirm',
+      name: 'ftpDeploy',
+      message: 'Do you want the bits so you can deploy this via ftp?',
+      default: false
+    },  {
+      type: 'confirm',
+      name: 's3Deploy',
+      message: 'Do you want the bits so you can deploy this via s3?',
+      default: false
     }];
 
     this.prompt(prompts, function (props) {
       this.projectName = props.projectName;
       this.coffee = props.coffee;
       this.libsass = props.libsass;
+      this.ftpDeploy = props.ftpDeploy;
+      this.s3Deploy = props.s3Deploy;
 
       done();
     }.bind(this));
@@ -57,6 +69,8 @@ var JadePreviewGenerator = yeoman.generators.Base.extend({
       } else {
         this.src.copy('main.js', 'app/scripts/main.js');
       }
+      this.dest.mkdir('app/styles');
+      this.src.copy('main.scss', 'app/styles/main.scss');
       this.dest.mkdir('app/styles/fonts');
       this.write('app/styles/fonts/.gitkeep', '');
     },
@@ -64,7 +78,12 @@ var JadePreviewGenerator = yeoman.generators.Base.extend({
     projectfiles: function () {
       this.template('_package.json', 'package.json');
       this.src.copy('_bower.json', 'bower.json');
-      this.src.copy('s3.json', 's3.json');
+      if (this.ftpDeploy) {
+        this.src.copy('ftp.json', 'ftp.json');
+      }
+      if (this.s3Deploy) {
+        this.src.copy('aws.json', 'aws.json');
+      }
       this.src.copy('README.md', 'README.md');
       this.template('Gruntfile.js', 'Gruntfile.js');
       this.src.copy('editorconfig', '.editorconfig');

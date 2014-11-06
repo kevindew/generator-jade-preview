@@ -1,8 +1,10 @@
 {
   "name": "<%= _.slugify(projectName) %>",
   "devDependencies": {
+    "chalk": "^0.5.0",
     "grunt": "^0.4.5",
-    "grunt-autoprefixer": "^1.0.0",
+    "grunt-autoprefixer": "^1.0.0",<% if (s3Deploy) { %>
+    "grunt-aws-s3": "^0.9.4",<% } %>
     "grunt-concurrent": "^0.5.0",
     "grunt-contrib-clean": "^0.6.0",<% if (coffee) { %>
     "grunt-contrib-coffee": "^0.11.0",<% } %>

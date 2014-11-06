@@ -6,13 +6,21 @@ html.no-js
     meta(http-equiv='X-UA-Compatible', content='IE=edge')
     title= ( pageTitle ? pageTitle + ' | ' : '' ) + '<%= projectName %>'
     meta(name='description', content='')
-    // build:css({.,app,.tmp}) /styles/main.css
-    link(rel='stylesheet', href='/styles/main.css')
-    // endbuild
+    meta(name='viewport',content='width=device-width, initial-scale=1')
     // build:js({.,app,.tmp}) /scripts/header.js
     script(src='/bower_components/modernizr/modernizr.js')
     // endbuild
+    // build:css({.,app,.tmp}) /styles/main.css
+    link(rel='stylesheet', href='/styles/main.css')
+    // endbuild
+    //- link(rel='shortcut icon',href='/favicon.ico')
+    //- link(rel='apple-touch-icon-precomposed',href='/apple-touch-icon.png')
   body
+    <!--[if lt IE 8]>
+    p.browserupgrade.
+      You are using an #[strong outdated] browser. Please #[a(href='http://browsehappy.com/') upgrade your browser] to improve your experience.
+    <![endif]-->
+
     header
       h1 <%= projectName %>
 
@@ -21,6 +29,5 @@ html.no-js
 
     // build:js({.,app,.tmp}) /scripts/footer.js
     script(src='/bower_components/jquery/dist/jquery.js')
-    script(src='/bower_components/masonry/dist/masonry.pkgd.js')
     script(src='/scripts/main.js')
     // endbuild

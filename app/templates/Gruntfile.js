@@ -28,7 +28,7 @@ module.exports = function (grunt) {
     // Watches files for changes and runs tasks based on the changed files
     watch: {
       jade: {
-        files: ['<%= config.app %>/**/*.jade'],
+        files: ['<%%= config.app %>/**/*.jade'],
         tasks: ['jade']
       },<% if (coffee) { %>
       coffee: {
@@ -58,7 +58,7 @@ module.exports = function (grunt) {
           livereload: '<%%= connect.options.livereload %>'
         },
         files: [
-          'tmp/**/*.html',
+          '.tmp/**/*.html',
           '.tmp/styles/**/*.css',<% if (coffee) { %>
           '.tmp/scripts/**/*.js',<% } %>
           '<%%= config.app %>/images/**/*'
@@ -80,6 +80,7 @@ module.exports = function (grunt) {
           middleware: function(connect) {
             return [
               connect.static('.tmp'),
+              connect().use('/bower_components', connect.static('./bower_components')),
               connect.static(config.app)
             ];
           }
@@ -131,7 +132,7 @@ module.exports = function (grunt) {
         },
         files: [{
           expand: true,
-          cwd: '<%= config.app %>',
+          cwd: '<%%= config.app %>',
           dest: '.tmp',
           src: [
             '**/*.jade',

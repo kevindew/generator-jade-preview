@@ -1,0 +1,15 @@
+@import 'normalize-scss/normalize';
+
+body {
+  background: #efeedf;
+  color: #918f7e;
+  font-family: monospace;
+  padding: 1em;
+  font-size: 150%;
+}
+
+header, main {
+  width: 45em;
+  max-width: 100%;
+  margin: auto;
+}

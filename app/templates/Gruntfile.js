@@ -16,8 +16,25 @@ module.exports = function (grunt) {
   var config = {
     app: 'app',
     preview: 'preview',
-    dist: 'dist'
-  };
+    dist: 'dist'<% if (s3Deploy) { %>,
+    awsJsonPath: 'aws.json'<% } %><% if (ftpDeploy) { %>,
+    ftpJsonPath: 'ftp.json'<% } %>
+  };<% if (s3Deploy) { %>
+
+  var aws = {};
+  if (grunt.file.exists(config.awsJsonPath)) {
+    aws = grunt.file.readJSON(config.awsJsonPath);
+  } else {
+    grunt.log.warn(
+      ('Warning - you don\'t have a ' + config.awsJsonPath + ' file, please generate one by running `grunt generate:awsJson`').yellow
+    );
+  }
+  <% } %><% if (ftpDeploy) { %>
+  if (!grunt.file.exists(config.ftpJsonPath)) {
+    grunt.log.warn(
+      ('Warning - you don\'t have a ' + config.ftpJsonPath + ' file, please generate one by running `grunt generate:ftpJson`').yellow
+    );
+  }<% } %>
 
   // Define the configuration for all the tasks
   grunt.initConfig({
@@ -88,13 +105,13 @@ module.exports = function (grunt) {
       },
       preview: {
         options: {
-          base: '<%%= config.preview %>',
+          base: config.preview,
           livereload: false
         }
       },
       dist: {
         options: {
-          base: '<%%= config.dist %>',
+          base: config.dist,
           livereload: false
         }
       }
@@ -236,7 +253,7 @@ module.exports = function (grunt) {
     // additional tasks can operate on them
     useminPrepare: {
       options: {
-        dest: '<%%= config.dist %>'
+        dest: config.dist
       },
       html: '<%%= config.dist %>/index.html'
     },
@@ -245,7 +262,7 @@ module.exports = function (grunt) {
     usemin: {
       options: {
         assetsDirs: [
-          '<%%= config.dist %>',
+          config.dist,
           '<%%= config.dist %>/images',
           '<%%= config.dist %>/styles'
         ]
@@ -292,9 +309,9 @@ module.exports = function (grunt) {
         },
         files: [{
           expand: true,
-          cwd: '<%%= config.dist %>',
+          cwd: config.dist,
           src: '**/*.html',
-          dest: '<%%= config.dist %>'
+          dest: config.dist
         }]
       }
     },
@@ -331,8 +348,8 @@ module.exports = function (grunt) {
         files: [{
           expand: true,
           dot: true,
-          cwd: '<%%= config.app %>',
-          dest: '<%%= config.dist %>',
+          cwd: config.app,
+          dest: config.dist,
           src: [
             '*.{ico,png,txt}',
             'images/**/*.webp',
@@ -342,13 +359,13 @@ module.exports = function (grunt) {
           expand: true,
           dot: true,
           cwd: '.tmp',
-          dest: '<%%= config.dist %>',
+          dest: config.dist,
           src: 'images/**/*.{gif,jpeg,jpg,png,.svg}',
         }, {
           expand: true,
           dot: true,
           cwd: '.',
-          dest: '<%%= config.dist %>',
+          dest: config.dist,
           src: 'bower_components/**/*.{eot,woff,woff2,svg,ttf}',
         }]
       },
@@ -357,13 +374,13 @@ module.exports = function (grunt) {
           expand: true,
           dot: true,
           cwd: '.tmp',
-          dest: '<%%= config.dist %>',
+          dest: config.dist,
           src: '**/*.html'
         }, {
           expand: true,
           dot: true,
-          cwd: '<%%= config.app %>',
-          dest: '<%%= config.dist %>',
+          cwd: config.app,
+          dest: config.dist,
           src: '**/*.html'
         }]
       },
@@ -371,8 +388,8 @@ module.exports = function (grunt) {
         files: [{
           expand: true,
           dot: true,
-          cwd: '<%%= config.app %>',
-          dest: '<%%= config.preview %>',
+          cwd: config.app,
+          dest: config.preview,
           src: [
             '*.{ico,png,txt}',
             'images/**/*.webp',
@@ -384,7 +401,7 @@ module.exports = function (grunt) {
           expand: true,
           dot: true,
           cwd: '.tmp',
-          dest: '<%%= config.preview %>',
+          dest: config.preview,
           src: [
             'images/**/*.{gif,jpeg,jpg,png,.svg}',
             '**/*.html',
@@ -395,7 +412,7 @@ module.exports = function (grunt) {
           expand: true,
           dot: true,
           cwd: '.',
-          dest: '<%%= config.preview %>',
+          dest: config.preview,
           src: 'bower_components/**/*',
         }]
       },
@@ -407,7 +424,6 @@ module.exports = function (grunt) {
         src: '**/*.css'
       }
     },
-
 
     // Generates a custom Modernizr build that includes only the tests you
     // reference in your app
@@ -424,7 +440,101 @@ module.exports = function (grunt) {
         },
         uglify: true
       }
-    },
+    },<% if (s3Deploy) { %>
+
+    aws_s3: {
+      options: {
+        accessKeyId: aws.AWSAccessKeyId, // Use the variables
+        secretAccessKey: aws.AWSSecretKey, // You can also use env variables
+        region: 'eu-west-1', // change this if you have a different region
+        uploadConcurrency: 5, // 5 simultaneous uploads
+        downloadConcurrency: 5 // 5 simultaneous downloads
+      },
+      preview: {
+        options: {
+          bucket: 'preview-bucket'
+        },
+        files: [{
+          expand: true,
+          cwd: config.preview,
+          src: '**',
+          dest: ''
+        }]
+      },
+      cleanPreview: {
+        options: {
+          bucket: 'preview-bucket'
+        },
+        files: [{
+          dest: '/',
+          action: 'delete'
+        }]
+      },
+      dist: {
+        options: {
+          bucket: 'dist-bucket'
+        },
+        files: [{
+          expand: true,
+          cwd: config.dist,
+          src: [
+            'scripts/**/*.js',
+            'styles/**/*.css',
+            'images/**/*.*',
+            'styles/fonts/**/*.*',
+            'bower_components/**/*.{eot,woff,woff2,svg,ttf}'
+          ],
+          dest: '',
+          params: {
+            CacheControl: 'max-age=' + (60 * 60 * 24 * 28).toString()
+          }
+        },{
+          expand: true,
+          cwd: '<%%= config.dist %>',
+          src: [
+            '**',
+            '!scripts/**/*.js',
+            '!styles/**/*.css',
+            '!images/**/*.*',
+            '!styles/fonts/**/*.*',
+            '!bower_components/**/*.{eot,woff,woff2,svg,ttf}'
+          ],
+          dest: ''
+        }]
+      },
+      cleanDist: {
+        options: {
+          bucket: 'dist-bucket'
+        },
+        files: [{
+          dest: '/',
+          action: 'delete'
+        }]
+      }
+    },<% } %><% if (ftpDeploy) { %>
+
+    'ftp-deploy': {
+      preview: {
+        auth: {
+          host: 'example.com',
+          port: 21,
+          authPath: config.ftpJsonPath,
+          authKey: 'preview'
+        },
+        src: config.preview,
+        dest: 'httpdocs' // destination on server
+      },
+      dist: {
+        auth: {
+          host: 'example.com',
+          port: 21,
+          authPath: config.ftpJsonPath,
+          authKey: 'dist'
+        },
+        src: config.dist,
+        dest: 'httpdocs' // destination on server
+      }
+    },<% } %>
 
     // Run some tasks in parallel to speed up build process
     concurrent: {
@@ -506,5 +616,65 @@ module.exports = function (grunt) {
     'newer:jshint',
     'build:preview',
     'build:dist'
-  ]);
+  ]);<% if (s3Deploy) { %>
+
+  grunt.registerTask('s3Deploy', function(target) {
+    if (target === 'preview') {
+      return grunt.task.run(
+        'build:preview',
+        'aws_s3:cleanPreview',
+        'aws_s3:preview'
+      );
+    }
+    grunt.task.run(
+      'build:dist',
+      'aws_s3:cleanDist',
+      'aws_s3:dist'
+    );
+  });<% } %><% if (ftpDeploy) { %>
+
+  grunt.registerTask('ftpDeploy', function(target) {
+    if (target === 'preview') {
+      return grunt.task.run(
+        'build:preview',
+        'ftp-deploy:preview'
+      );
+    }
+    grunt.task.run(
+      'build:dist',
+      'ftp-deploy:dist'
+    );
+  });<% } %><% if (s3Deploy || ftpDeploy) { %>
+
+  grunt.registerTask('generate', function(target) {
+    <% if (s3Deploy) { %>if (target === 'awsJson') {
+      if (grunt.file.exists(config.awsJsonPath)) {
+        return grunt.log.error(
+          ('There\'s already a file of ' + config.awsJsonPath + ' please delete or rename this if you want to re-run this generator').red
+        );
+      }
+      grunt.file.write(config.awsJsonPath, JSON.stringify({
+        AWSAccessKeyId: 'Your AWS Access Key Id',
+        AWSSecretKey: 'Your AWS Secret Key'
+      }, null, 2));
+      return grunt.log.writeln().success('File created. Please update the credentials in ' + config.awsJsonPath);
+    }<% } %><% if (ftpDeploy) { %>
+
+    if (target === 'ftpJson') {
+      if (grunt.file.exists(config.ftpJsonPath)) {
+        return grunt.log.error(
+          ('There\'s already a file of ' + config.ftpJsonPath + ' please delete or rename this if you want to re-run this generator').red
+        );
+      }
+      var data = {}
+      for (var key in grunt.config.data['ftp-deploy']) {
+        data[key] = {
+          username: 'Your username',
+          password: 'Your password'
+        }
+      }
+      grunt.file.write(config.ftpJsonPath, JSON.stringify(data, null, 2));
+      return grunt.log.writeln().success('File created. Please update the credentials in ' + config.ftpJsonPath);
+    }<% } %>
+  });<% } %>
 };

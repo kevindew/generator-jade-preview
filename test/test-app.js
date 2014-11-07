@@ -33,8 +33,7 @@ describe('jade-preview:app', function () {
     '.gitignore',
     'Gruntfile.js',
     '.jshintrc',
-    'README.md',
-    's3.json'
+    'README.md'
   ];
 
   it('creates files', function (done) {
@@ -91,6 +90,44 @@ describe('jade-preview:app', function () {
 
       assert.noFileContent([
         ['package.json', /grunt-contrib-sass/]
+      ]);
+
+      done();
+    });
+  });
+
+  it('creates AWS S3 files and references', function (done) {
+    runGen.withOptions(options).withPrompt({ s3Deploy: true })
+    .on('end', function () {
+
+      assert.file([].concat(
+        expected,
+        'aws.json'
+      ));
+      assert.noFile('ftp.json');
+
+      assert.fileContent([
+        ['Gruntfile.js', /s3Deploy/],
+        ['package.json', /grunt-aws-s3/]
+      ]);
+
+      done();
+    });
+  });
+
+  it('creates FTP files and references', function (done) {
+    runGen.withOptions(options).withPrompt({ ftpDeploy: true })
+    .on('end', function () {
+
+      assert.file([].concat(
+        expected,
+        'ftp.json'
+      ));
+      assert.noFile('aws.json');
+
+      assert.fileContent([
+        ['Gruntfile.js', /ftpDeploy/],
+        ['package.json', /grunt-ftp-deploy/]
       ]);
 
       done();

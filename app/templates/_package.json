@@ -18,7 +18,8 @@
     "grunt-contrib-jade": "^0.13.0",<% if (!libsass) { %>
     "grunt-contrib-sass": "^0.7.3",<% } %>
     "grunt-contrib-uglify": "^0.5.1",
-    "grunt-contrib-watch": "^0.6.1",
+    "grunt-contrib-watch": "^0.6.1",<% if (ftpDeploy) { %>
+    "grunt-ftp-deploy": "^0.1.9",<% } %>
     "grunt-modernizr": "^0.5.2",
     "grunt-newer": "^0.7.0",
     "grunt-rev": "^0.1.0",<% if (libsass) { %>

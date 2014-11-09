@@ -17,8 +17,8 @@ module.exports = function (grunt) {
     app: 'app',
     preview: 'preview',
     dist: 'dist'<% if (s3Deploy) { %>,
-    awsJsonPath: 'aws.json'<% } %><% if (ftpDeploy) { %>,
-    ftpJsonPath: 'ftp.json'<% } %>
+    awsJsonPath: '.aws.json'<% } %><% if (ftpDeploy) { %>,
+    ftpJsonPath: '.ftp.json'<% } %>
   };<% if (s3Deploy) { %>
 
   var aws = {};

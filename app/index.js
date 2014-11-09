@@ -79,12 +79,24 @@ var JadePreviewGenerator = yeoman.generators.Base.extend({
       this.template('_package.json', 'package.json');
       this.src.copy('_bower.json', 'bower.json');
       if (this.ftpDeploy) {
-        this.src.copy('ftp.json', 'ftp.json');
+        this.write('.ftp.json', JSON.stringify({
+          preview: {
+            username: 'username',
+            password: 'password'
+          },
+          dist: {
+            username: 'username',
+            password: 'password'
+          }
+        }, null, 2));
       }
       if (this.s3Deploy) {
-        this.src.copy('aws.json', 'aws.json');
+        this.write('.aws.json', JSON.stringify({
+          AWSAccessKeyId: "Your Access Key",
+          AWSSecretKey: "Your Secret Key"
+        }, null, 2));
       }
-      this.src.copy('README.md', 'README.md');
+      this.template('README.md', 'README.md');
       this.template('Gruntfile.js', 'Gruntfile.js');
       this.src.copy('editorconfig', '.editorconfig');
       this.src.copy('jshintrc', '.jshintrc');

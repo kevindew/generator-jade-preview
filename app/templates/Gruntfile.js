@@ -360,13 +360,13 @@ module.exports = function (grunt) {
           dot: true,
           cwd: '.tmp',
           dest: config.dist,
-          src: 'images/**/*.{gif,jpeg,jpg,png,.svg}',
+          src: 'images/**/*.{gif,jpeg,jpg,png,svg}',
         }, {
           expand: true,
           dot: true,
           cwd: '.',
           dest: config.dist,
-          src: 'bower_components/**/*.{eot,woff,woff2,svg,ttf}',
+          src: 'bower_components/**/*.{eot,woff,woff2,svg,ttf,gif,jgp,jpeg,png}',
         }]
       },
       distHtml: {
@@ -403,7 +403,7 @@ module.exports = function (grunt) {
           cwd: '.tmp',
           dest: config.preview,
           src: [
-            'images/**/*.{gif,jpeg,jpg,png,.svg}',
+            'images/**/*.{gif,jpeg,jpg,png,svg}',
             '**/*.html',
             'styles/**/*.css',
             'scripts/**/*.js'
@@ -482,7 +482,7 @@ module.exports = function (grunt) {
             'styles/**/*.css',
             'images/**/*.*',
             'styles/fonts/**/*.*',
-            'bower_components/**/*.{eot,woff,woff2,svg,ttf}'
+            'bower_components/**/*.{eot,woff,woff2,svg,ttf,gif,jgp,jpeg,png}'
           ],
           dest: '',
           params: {
@@ -497,7 +497,7 @@ module.exports = function (grunt) {
             '!styles/**/*.css',
             '!images/**/*.*',
             '!styles/fonts/**/*.*',
-            '!bower_components/**/*.{eot,woff,woff2,svg,ttf}'
+            '!bower_components/**/*.{eot,woff,woff2,svg,ttf,gif,jgp,jpeg,png}'
           ],
           dest: ''
         }]

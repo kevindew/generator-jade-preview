@@ -4,4 +4,5 @@ dist
 .tmp
 .sass-cache
 bower_components
-s3.json
+.aws.json
+.ftp.json

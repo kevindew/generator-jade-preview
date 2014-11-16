@@ -242,7 +242,8 @@ module.exports = function (grunt) {
             '<%%= config.dist %>/scripts/**/*.js',
             '<%%= config.dist %>/styles/**/*.css',
             '<%%= config.dist %>/images/**/*.*',
-            '<%%= config.dist %>/styles/fonts/**/*.*'
+            '<%%= config.dist %>/styles/fonts/**/*.*',
+            '<%= config.dist %>/bower_components/*/**/*.*'
           ]
         }
       }
@@ -360,13 +361,13 @@ module.exports = function (grunt) {
           dot: true,
           cwd: '.tmp',
           dest: config.dist,
-          src: 'images/**/*.{gif,jpeg,jpg,png,svg}',
+          src: 'images/**/*.{gif,jpeg,jpg,png,svg}'
         }, {
           expand: true,
           dot: true,
           cwd: '.',
           dest: config.dist,
-          src: 'bower_components/**/*.{eot,woff,woff2,svg,ttf,gif,jgp,jpeg,png}',
+          src: 'bower_components/**/*.{eot,woff,woff2,svg,ttf,gif,jgp,jpeg,png}'
         }]
       },
       distHtml: {

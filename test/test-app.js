@@ -102,9 +102,9 @@ describe('jade-preview:app', function () {
 
       assert.file([].concat(
         expected,
-        'aws.json'
+        '.aws.json'
       ));
-      assert.noFile('ftp.json');
+      assert.noFile('.ftp.json');
 
       assert.fileContent([
         ['Gruntfile.js', /s3Deploy/],
@@ -121,9 +121,9 @@ describe('jade-preview:app', function () {
 
       assert.file([].concat(
         expected,
-        'ftp.json'
+        '.ftp.json'
       ));
-      assert.noFile('aws.json');
+      assert.noFile('.aws.json');
 
       assert.fileContent([
         ['Gruntfile.js', /ftpDeploy/],
